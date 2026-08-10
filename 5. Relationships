@@ -1,1 +1,43 @@
 
+### Star Schema 101
+A star schema has one fact table at the center surrounded by dimension tables. This is the standard structure for Power BI data models.
+
+```
+              dim_customers
+                    |
+dim_products — fact_orders — dim_dates
+                    |
+              dim_regions
+```
+
+**Rules:**
+- The fact table holds numbers and foreign keys only
+- Dimension tables hold descriptive attributes
+- Every foreign key in the fact table links to a primary key in a dimension
+- Filters flow from dimension → fact (single direction)
+- No repeated attribute columns in the fact table — if it describes something, it belongs in a dimension
+
+> 📸 Screenshot: Model view showing a clean star schema
+
+---
+
+### Complicated Relationships
+
+**Inactive relationships**
+You can have multiple relationships between two tables but only one can be active at a time. Use USERELATIONSHIP() in DAX to activate an inactive one inside a specific measure.
+
+```dax
+Sales by Ship Date =
+CALCULATE(
+    [Total Revenue],
+    USERELATIONSHIP(fact_orders[ship_date], DateTable[Date])
+)
+```
+
+**Bidirectional filtering**
+By default filters flow from dimension to fact only. Setting Both means filters travel in both directions. Use sparingly — it can create ambiguous results and slow performance.
+
+**Role-playing dimensions**
+When the same dimension (e.g., DateTable) links to the fact table multiple times (order_date, ship_date, delivery_date), only one relationship is active. The others are inactive dashed lines accessed via USERELATIONSHIP.
+
+> 📸 Screenshot: Model view showing active relationship (solid line) vs inactive (dashed line)
