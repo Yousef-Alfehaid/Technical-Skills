@@ -1,1 +1,65 @@
 
+### Master Code
+Copy and paste this every project. Never rely on Power BI auto date hierarchy.
+
+```dax
+DateTable =
+CALENDAR(
+    DATE(2020, 1, 1),
+    DATE(2025, 12, 31)
+)
+```
+
+Add these calculated columns inside DateTable:
+
+```dax
+Year       = YEAR([Date])
+MonthNum   = MONTH([Date])
+MonthName  = FORMAT([Date], "MMM")
+Quarter    = "Q" & ROUNDUP(MONTH([Date]) / 3, 0)
+YearMonth  = FORMAT([Date], "YYYY-MM")
+WeekNum    = WEEKNUM([Date])
+WeekDay    = FORMAT([Date], "ddd")
+WeekDayNum = WEEKDAY([Date], 2)
+IsWeekend  = IF(WEEKDAY([Date], 2) >= 6, TRUE, FALSE)
+FiscalYear = IF(MONTH([Date]) >= 4,
+               "FY" & YEAR([Date]),
+               "FY" & (YEAR([Date]) - 1))
+```
+
+---
+
+### Mark as Date Table
+Mandatory for time intelligence functions to work correctly (DATEADD, DATESYTD, etc.).
+
+**How:**
+Click DateTable in the Fields pane → Table Tools → Mark as Date Table → select the [Date] column
+
+Without this step, time intelligence DAX functions return blank or incorrect results even if the table looks correct.
+
+> 📸 Screenshot: Table Tools ribbon → Mark as Date Table dialog
+
+---
+
+### Sort MonthName by MonthNum
+Without this step, months sort alphabetically (Apr, Aug, Dec) instead of chronologically (Jan, Feb, Mar).
+
+**How:**
+1. Click the MonthName column in DateTable
+2. Column Tools → Sort by Column → MonthNum
+
+> 📸 Screenshot: Chart with alphabetical months → after sort fix showing Jan to Dec
+
+---
+
+### Discrete vs Continuous Date Axis
+
+| | Discrete (Categorical) | Continuous |
+|---|---|---|
+| **Appearance** | Even spacing regardless of time gaps | Gaps appear where no data exists |
+| **Use when** | Comparing periods as categories | True time series where gaps matter |
+| **How to set** | Click axis → type = Categorical | Click axis → type = Continuous |
+
+When your line chart shows uneven spacing or jumps, check the axis type first before investigating your data.
+
+> 📸 Screenshot: Same data — Categorical axis vs Continuous axis
