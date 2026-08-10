@@ -1,1 +1,94 @@
+### CALCULATE
+The most important function in DAX. Evaluates an expression in a modified filter context.
+
+```dax
+// Structure
+CALCULATE(<expression>, <filter1>, <filter2>)
+
+// Revenue for Saudi customers only
+Saudi Revenue =
+CALCULATE(
+    SUM(fact_orders[revenue]),
+    dim_customers[nationality] = "Saudi"
+)
+
+// Revenue for last year
+Revenue LY =
+CALCULATE(
+    [Total Revenue],
+    DATEADD(DateTable[Date], -1, YEAR)
+)
+```
+
+**Why it matters:**
+Without CALCULATE you cannot modify filters inside a measure. Any time you need a number to change based on a condition you define — not just what slicers apply — you need CALCULATE.
+
+**Common mistake:**
+```dax
+-- WRONG — this is not valid DAX syntax
+Revenue Saudi = SUM(fact_orders[revenue], [nationality] = "Saudi")
+
+-- RIGHT
+Revenue Saudi =
+CALCULATE(SUM(fact_orders[revenue]), dim_customers[nationality] = "Saudi")
+```
+
+> 📸 Screenshot: Two KPI cards — Total Revenue vs Saudi Revenue showing CALCULATE filtering correctly
+
+---
+
+### ALL vs REMOVEFILTERS
+
+| | ALL() | REMOVEFILTERS() |
+|---|---|---|
+| **Purpose** | Remove filters AND can return a table | Remove filters only |
+| **As table expression** | Yes — can be used inside FILTER or TOPN | No |
+| **Clarity of intent** | Overloaded — does two things | Single purpose — clearer |
+| **Recommendation** | Use when you need all rows as a table | Use when you only want to clear a filter |
+
+```dax
+// REMOVEFILTERS — clear a filter on one column
+Revenue All Cities =
+CALCULATE([Total Revenue], REMOVEFILTERS(dim_regions[city]))
+
+// ALL — same result for simple cases
+Revenue All Cities =
+CALCULATE([Total Revenue], ALL(dim_regions[city]))
+
+// ALL as a table — REMOVEFILTERS cannot do this
+Revenue Pct of Total =
+DIVIDE(
+    [Total Revenue],
+    CALCULATE([Total Revenue], ALL(fact_orders))
+)
+```
+
+> 📸 Screenshot: Bar chart showing % of total — bars using ALL to divide against unfiltered total
+
+---
+
+### Measures vs Calculated Columns
+
+| | Measure | Calculated Column |
+|---|---|---|
+| **When calculated** | At visual render time | At data refresh time |
+| **Responds to slicers** | Yes | No — fixed at refresh |
+| **Storage** | None — computed on demand | Stored in model — increases file size |
+| **Use for** | Aggregations: SUM, COUNT, DIVIDE, AVERAGE | Row-level logic: categories, flags, combinations |
+| **Icon in field pane** | Calculator | Table column |
+
+```dax
+-- Measure — goes in _Measures table
+Total Revenue = SUM(fact_orders[revenue])
+
+-- Calculated Column — goes in the source table
+Price Tier =
+IF(fact_orders[unit_price] > 1000, "Premium",
+   IF(fact_orders[unit_price] > 500, "Mid", "Budget"))
+```
+
+**Common mistake:**
+Creating a calculated column for something that needs to respond to filters. If the value should change when a slicer is used, it must be a measure — not a column.
+
+> 📸 Screenshot: Field pane showing measure icon (calculator) vs calculated column icon (sigma/table)
 
