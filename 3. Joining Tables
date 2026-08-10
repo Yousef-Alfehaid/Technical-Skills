@@ -1,0 +1,43 @@
+
+### Merge (SQL JOIN equivalent)
+Used when two tables share a common key and you want to bring columns from one into the other.
+
+**How:**
+Home → Merge Queries → select key column in both tables → choose join type
+
+| Join Type | What it does |
+|---|---|
+| Left Outer | Keep all rows from left, match from right where possible |
+| Inner | Keep only rows that match in both tables |
+| Full Outer | Keep all rows from both tables |
+| Left Anti | Keep rows in left that have no match in right |
+
+**In M code:**
+```m
+= Table.NestedJoin(
+    Table1, "key_column",
+    Table2, "key_column",
+    "NewColumn", JoinKind.LeftOuter)
+```
+Then expand the new column to bring in the fields you need.
+
+> 📸 Screenshot: Merge dialog → join type selection → expanded result
+
+---
+
+### Append (SQL UNION equivalent)
+Used when two tables have the same columns and you want to stack them vertically.
+
+**How:**
+Home → Append Queries → select tables to combine
+
+**In M code:**
+```m
+= Table.Combine({Table_Jan, Table_Feb, Table_Mar})
+```
+
+**One-line rule:**
+- Same columns, more rows → **Append**
+- Different columns, need to match on a key → **Merge**
+
+> 📸 Screenshot: Two tables side by side → Append result stacked into one
