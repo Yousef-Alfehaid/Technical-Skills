@@ -1,0 +1,35 @@
+
+### ToText Method
+When changing a column type causes errors, convert to text first before changing to the target type. This prevents Power Query from trying to interpret ambiguous values directly.
+
+```m
+// Step 1 — convert to text first
+= Table.TransformColumnTypes(Source, {{"column_name", type text}})
+
+// Step 2 — then convert to your target type
+= Table.TransformColumnTypes(#"Previous Step", {{"column_name", type date}})
+```
+
+> 📸 Screenshot: Show a column with mixed values → the two-step transformation in Applied Steps
+
+---
+
+### Date Error — How to Handle It
+Date errors occur when values are in an unexpected format (e.g., `31/01/2024` vs `2024-01-31`) or when the column contains blanks or text mixed in.
+
+**Fix 1 — Force text first then parse:**
+```m
+= Table.TransformColumns(Source, {{"date_column",
+    each try Date.FromText(Text.From(_)) otherwise null,
+    type date}})
+```
+
+**Fix 2 — Replace errors with null:**
+```m
+= Table.ReplaceErrorValues(Source, {{"date_column", null}})
+```
+
+**Fix 3 — Change regional settings:**
+File → Options → Regional Settings → change locale to match your date format (e.g., English (Saudi Arabia) for dd/mm/yyyy)
+
+> 📸 Screenshot: Date error in column → Applied Steps showing the fix → clean result
