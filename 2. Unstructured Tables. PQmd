@@ -1,0 +1,47 @@
+
+
+## Glossary
+### 1. Use First Row as Headers
+When data arrives with no headers or with headers sitting in row 1 as data.
+
+### 2. Transpose
+Flips rows and columns. Useful when data arrives with months as rows but you need them as columns, or vice versa.
+
+### 3. Unpivot
+Converts wide tables (one column per category) into tall tables (one row per value). One of the most important transformations for making real-world data usable in Power BI.
+
+**Example — before:**
+
+| Product | Jan | Feb | Mar |
+|---|---|---|---|
+| Widget A | 100 | 120 | 90 |
+
+**After unpivot:**
+
+| Product | Month | Sales |
+|---|---|---|
+| Widget A | Jan | 100 |
+| Widget A | Feb | 120 |
+| Widget A | Mar | 90 |
+
+
+--- 
+
+## Why we often transpose / unpivot?
+
+![human vs robot table](images/human-table-vs-robot-table.png)
+
+Two reasons : 
+- To mainly help the Computer (which in our case) Excel, PowerBI, to calculate easily without having to rely on multiple columns for measurements.
+- OR we can transpose or unpivot the table based on business needs. (which in most cases to make tables look presentable for stakeholders.)
+
+### Example of Human friendly table : 
+*high columns, low rows*
+![human table](images/human-table.png)
+
+### Example of Computer friendly table : 
+*high rows, low columns*
+![robot table](images/robot-table.png)
+
+
+
