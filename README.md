@@ -2,10 +2,11 @@
   # Technical-Skills
 In regards of [ Data ] 
 
-### The tools included in this repository are :
+### The repository includes :
 - Excel
 - PowerBI
 - SQL
+- AI (soon)
 
 ### It also includes
 - images
